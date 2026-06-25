@@ -58,6 +58,56 @@ This workflow provides intelligent customer support by answering FAQs from a Not
 
 ---
 
+## Architecture
+
+```text
+User
+  │
+  ▼
+n8n Chat Trigger
+  │
+  ▼
+Conversation State (Notion)
+  │
+  ▼
+Knowledge Base Search
+  │
+  ▼
+AI Agent
+  │
+  ▼
+Answer Found?
+   ├── Yes ──► Reply to User
+   │
+   └── No
+        │
+        ▼
+Category Selection
+        │
+        ▼
+Category Search
+        │
+        ▼
+AI Agent
+        │
+        ▼
+Answer Found?
+   ├── Yes ──► Reply to User
+   │
+   └── No
+        │
+        ▼
+Create Support Ticket
+        │
+        ▼
+Collect Customer Email
+        │
+        ▼
+Store Ticket in Notion
+        │
+        ▼
+Reset Conversation State
+```
 #  Workflow Overview
 
 1. User asks a question.
@@ -75,6 +125,80 @@ This workflow provides intelligent customer support by answering FAQs from a Not
    - Resets the conversation.
 
 ---
+
+## Demo Conversation
+
+```text
+User:
+Where is your office?
+
+↓
+
+AI:
+I couldn't find an exact answer.
+
+Which category best matches your issue?
+
+Account
+Billing
+Subscription
+Technical
+General
+
+Please type the category name.
+
+↓
+
+User:
+General
+
+↓
+
+AI:
+I still couldn't find an answer to your question.
+
+Would you like me to create a support ticket?
+
+Please type:
+
+Yes
+
+or
+
+No
+
+↓
+
+User:
+Yes
+
+↓
+
+AI:
+Your support ticket has been created successfully.
+
+Status: Open
+
+Our support team will review your request and get back to you as soon as possible.
+
+Please provide your email address so that we can contact you.
+
+↓
+
+User:
+vaibhav@gmail.com
+
+↓
+
+AI:
+Thank you.
+
+Your email has been recorded successfully.
+
+Our support team will contact you regarding your ticket.
+
+If you have another question, type Hello to start a new conversation.
+```
 
 #  Repository Structure
 
