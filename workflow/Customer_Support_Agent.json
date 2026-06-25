@@ -1,0 +1,1650 @@
+{
+  "name": "Customer_Support_Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -720,
+        48
+      ],
+      "id": "d6c2ca8a-b40f-4a30-a34c-b2e4d58e3599",
+      "name": "When chat message received",
+      "webhookId": "71b8bd65-fbbe-4aa3-9947-01d017abea4e"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "389aed9d-ae9b-8073-8400-ced91bb2e67d",
+          "mode": "list",
+          "cachedResultName": "Customer support knowledge base",
+          "cachedResultUrl": "https://app.notion.com/p/389aed9dae9b80738400ced91bb2e67d"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        16
+      ],
+      "id": "d9975b74-9a00-48f7-8dd4-6e0fbcfbac9f",
+      "name": "Get many database pages",
+      "credentials": {
+        "notionApi": {
+          "id": "94XrDpH5wBvZq544",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let kb = \"\";\n\nfor (const item of items) {\n  if (item.json.property_status !== \"Active\") continue;\n\n  kb += `Category: ${item.json.property_category}\\n`;\n  kb += `Question: ${item.json.property_question}\\n`;\n  kb += `Answer: ${item.json.property_answer}\\n\\n`;\n}\n\nreturn [{\n  json: {\n    knowledge: kb,\n    userQuestion: $('When chat message received').first().json.chatInput\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        16
+      ],
+      "id": "9a71c971-3754-4eca-8dae-b1604fb8da9f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "38aaed9d-ae9b-8053-9471-ce708ee6e491",
+          "mode": "list",
+          "cachedResultName": "Conversation State",
+          "cachedResultUrl": "https://app.notion.com/p/38aaed9dae9b80539471ce708ee6e491"
+        },
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Session ID|title",
+              "condition": "equals",
+              "titleValue": "={{ $('When chat message received').item.json.sessionId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -544,
+        48
+      ],
+      "id": "3cf2cb30-e32e-42be-ac3f-229e288d77b5",
+      "name": "Get many database pages1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "94XrDpH5wBvZq544",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d133febf-20c8-4dba-a21e-e3a5563706d7",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -368,
+        48
+      ],
+      "id": "be040ea4-aa69-48ef-b905-2544025ed85e",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "38aaed9d-ae9b-8053-9471-ce708ee6e491",
+          "mode": "list",
+          "cachedResultName": "Conversation State",
+          "cachedResultUrl": "https://app.notion.com/p/38aaed9dae9b80539471ce708ee6e491"
+        },
+        "title": "=",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Session ID|title",
+              "title": "={{ $('When chat message received').item.json.sessionId }}"
+            },
+            {
+              "key": "State|select",
+              "selectValue": "START"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -272,
+        -96
+      ],
+      "id": "b20eefd3-346d-472c-814f-d36aa1f5efae",
+      "name": "Create a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "94XrDpH5wBvZq544",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -160,
+        48
+      ],
+      "id": "8c026c98-8205-4b3b-be15-2335008e3827",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "38aaed9d-ae9b-8053-9471-ce708ee6e491",
+          "mode": "list",
+          "cachedResultName": "Conversation State",
+          "cachedResultUrl": "https://app.notion.com/p/38aaed9dae9b80539471ce708ee6e491"
+        },
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Session ID|title",
+              "condition": "equals",
+              "titleValue": "={{ $('When chat message received').item.json.sessionId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        48
+      ],
+      "id": "134a57bb-42e8-465c-8064-6f1d2cbdb77a",
+      "name": "Get many database pages2",
+      "credentials": {
+        "notionApi": {
+          "id": "94XrDpH5wBvZq544",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c5fa935b-c41c-4ed4-b38e-169cf598609c",
+              "leftValue": "={{ $json.property_state }}",
+              "rightValue": "START",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        176,
+        64
+      ],
+      "id": "f3d86a5b-e7f7-48e2-8ccf-e9380a718341",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are CSAI, a customer support AI assistant.\n\nCurrent State:\n{{ $json.state }}\n\nKnowledge Base:\n{{ $json.knowledge }}\n\nUser Message:\n{{ $json.userMessage }}\n\nRules:\n\nIF state is START:\n\n1. If the user says only \"hello\", \"hi\", \"hey\" or similar greetings, reply:\n\nHello! 👋\nWelcome to Customer Support.\n\nPlease tell me your question.\n\n2. Otherwise search the knowledge base.\n\n3. If an answer exists, reply ONLY with the answer.\n\n4. If no answer exists, reply EXACTLY:\n\nNOT_FOUND\n\n----------------------------\n\nIF state is WAITING_CATEGORY:\n\nThe user's previous question could not be answered.\n\nThe user will now send ONE category.\n\nPossible categories are:\n\n- Account\n- Billing\n- Subscription\n- Technical\n- General\n\nIgnore capitalization.\n\nExample:\ntechnical\nTECHNICAL\nTechnical\n\nall mean Technical.\n\nSearch ONLY inside that category for the previous question.\n\nIf you find an answer, reply ONLY with the answer.\n\nOtherwise reply exactly:\n\nSTILL_NOT_FOUND\n\nNever invent answers.\nNever explain.\nNever output JSON.\nOnly output plain text.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        992,
+        16
+      ],
+      "id": "766cd738-a53c-4924-81b9-06b056424606",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "qwen3:8b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        992,
+        160
+      ],
+      "id": "e378a762-6bf0-4ebc-b934-634865b12296",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "Z7cDfMzxwe71xbOd",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When chat message received').item.json.sessionId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        1088,
+        160
+      ],
+      "id": "37a9a21c-bcfe-4823-933f-53b697529942",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Current user message\nconst message = $('When chat message received').first().json.chatInput;\n\n// Temporary state (we'll store it properly later)\nlet state = \"START\";\n\nreturn [\n  {\n    json: {\n      ...$input.first().json,\n      state,\n      userMessage: message\n    }\n  }\n];;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        16
+      ],
+      "id": "bae28666-2430-4c6b-8681-7d8f93a0330b",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b41debdc-86e0-42cc-b926-fbe12dfa06f0",
+              "name": "output",
+              "value": "=I couldn't find an exact answer.\n\nWhich category best matches your issue?\n\n1️⃣ Account\n2️⃣ Billing\n3️⃣ Subscription\n4️⃣ Technical\n5️⃣ General\n\nPlease type the category name.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1648,
+        -64
+      ],
+      "id": "c90e378e-4062-4003-b5c8-fce321fffb2d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Get many database pages2').item.json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "State|select",
+              "selectValue": "WAITING_CATEGORY"
+            },
+            {
+              "key": "Original Question|rich_text",
+              "textContent": "={{ $('When chat message received').item.json.chatInput }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1472,
+        -64
+      ],
+      "id": "3378c142-6f1b-48a3-b9bc-d1accc6208e8",
+      "name": "Update a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "94XrDpH5wBvZq544",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "347c39ef-53ef-4df9-96b1-f4ed3f96053d",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "NOT_FOUND",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1296,
+        16
+      ],
+      "id": "47f10c74-edef-42ca-8374-fc10a46253af",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "501f06ca-7880-4ea5-8472-1e740f4f90a6",
+              "leftValue": "={{ $('If1').item.json.property_state }}",
+              "rightValue": "WAITING_CATEGORY",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        304,
+        320
+      ],
+      "id": "ff8a648a-327e-46e1-8f56-74bc0bda031c",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('When chat message received').item.json.chatInput\n  .toLowerCase()\n  .trim();\n\nlet category = \"\";\n\nif (input.includes(\"account\") || input.includes(\"acc\")) {\n  category = \"Account\";\n}\n\nelse if (\n  input.includes(\"billing\") ||\n  input.includes(\"bill\") ||\n  input.includes(\"payment\")\n) {\n  category = \"Billing\";\n}\n\nelse if (\n  input.includes(\"subscription\") ||\n  input.includes(\"sub\")\n) {\n  category = \"Subscription\";\n}\n\nelse if (\n  input.includes(\"technical\") ||\n  input.includes(\"tech\") ||\n  input.includes(\"otp\") ||\n  input.includes(\"login\")\n) {\n  category = \"Technical\";\n}\n\nelse if (input.includes(\"general\")) {\n  category = \"General\";\n}\n\nreturn [{\n  json: {\n    category\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        304
+      ],
+      "id": "023e0a55-b4f1-4c0e-9220-9b78e6b6eeb9",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Get many database pages1').item.json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Category|rich_text",
+              "textContent": "={{ $json.category }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        304
+      ],
+      "id": "7af7eb8d-c9d5-43e3-88f3-340da7af0ae6",
+      "name": "Update a database page1",
+      "credentials": {
+        "notionApi": {
+          "id": "94XrDpH5wBvZq544",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "389aed9d-ae9b-8073-8400-ced91bb2e67d",
+          "mode": "list",
+          "cachedResultName": "Customer support knowledge base",
+          "cachedResultUrl": "https://app.notion.com/p/389aed9dae9b80738400ced91bb2e67d"
+        },
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Category|select",
+              "condition": "equals",
+              "selectValue": "={{ $('Code in JavaScript3').item.json.category }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        304
+      ],
+      "id": "a4bf17f2-606e-48c3-82b2-6080e3274bed",
+      "name": "Get many database pages3",
+      "credentials": {
+        "notionApi": {
+          "id": "94XrDpH5wBvZq544",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let kb = \"\";\n\nfor (const item of items) {\n  kb += `Question: ${item.json.property_question}\\n`;\n  kb += `Answer: ${item.json.property_answer}\\n\\n`;\n}\n\nconst conversation = $items(\"Get many database pages3\")[0].json;\n\nreturn [{\n  json: {\n    knowledge: kb,\n    originalQuestion: conversation.property_original_question,\n    category: conversation.property_category\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        304
+      ],
+      "id": "cb74d88c-4746-4abf-814a-a4f9835444b8",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are CSAI, a customer support AI assistant.\n\nYou must answer ONLY from the Knowledge Base provided below.\n\n=========================\nKNOWLEDGE BASE\n=========================\n\n{{ $json.knowledge }}\n\n=========================\nUSER QUESTION\n=========================\n\n{{ $('Get many database pages2').item.json.property_original_question }}\n\n=========================\nRULES\n=========================\n\n1. Read every Question and Answer pair in the Knowledge Base.\n\n2. Compare the USER QUESTION with every Question by meaning.\n\n3. ONLY choose an answer if the Question is clearly asking the same thing.\n\n4. Ignore entries that merely share a few words.\n\n5. Never guess.\n\n6. Never combine answers.\n\n7. Never answer from your own knowledge.\n\n8. Never invent information.\n\n9. If multiple questions are similar, choose the closest semantic match only.\n\n10. If there is no clear match, return EXACTLY:\n\nI couldn't find that information in the knowledge base.\n\n11. Your response must contain ONLY the answer text.\nDo not explain.\nDo not mention the knowledge base.\nDo not include markdown.\nDo not include JSON.\nDo not include labels.\nDo not include additional sentences.\n\nReturn only plain text.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1184,
+        304
+      ],
+      "id": "c09c299f-41ed-4244-aa5d-bf7bb6eb8656",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "qwen3:8b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        448
+      ],
+      "id": "12bbe6ac-9fc2-4d50-99ab-9356ddac3efc",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "Z7cDfMzxwe71xbOd",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Get many database pages2').item.json.id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "State|select",
+              "selectValue": "START"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1472,
+        112
+      ],
+      "id": "4d4ae02c-8159-455f-b954-f1b95e268210",
+      "name": "Update a database page2",
+      "credentials": {
+        "notionApi": {
+          "id": "94XrDpH5wBvZq544",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "318907b8-98df-48ad-83d1-126d5156f9d0",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "I couldn't find that information in the knowledge base.",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1504,
+        304
+      ],
+      "id": "ffe7404a-a7dc-4f0c-b7de-b0db252e7c35",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Update a database page1').item.json.id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "State|select",
+              "selectValue": "START"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1712,
+        416
+      ],
+      "id": "58970eae-46b2-40ca-ac49-80a43c357690",
+      "name": "Update a database page3",
+      "credentials": {
+        "notionApi": {
+          "id": "94XrDpH5wBvZq544",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Update a database page1').item.json.id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "State|select",
+              "selectValue": "WAITING_TICKET_CONFIRMATION"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1712,
+        288
+      ],
+      "id": "ae759db4-5c58-407e-9de9-9a2d1e52272c",
+      "name": "Update a database page4",
+      "credentials": {
+        "notionApi": {
+          "id": "94XrDpH5wBvZq544",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f2f4f331-aafd-423f-83ac-6060db3c1806",
+              "name": "output",
+              "value": "=I still couldn't find an answer to your question.\n\nWould you like me to create a support ticket?\n\nPlease type:\n\nYes\n\nor\n\nNo",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1888,
+        288
+      ],
+      "id": "f3436efb-77b6-40fd-ab44-d17a89d6cf8b",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1f584b53-2b04-4d58-8dd8-b3f56f2ec13c",
+              "leftValue": "={{ $('Get many database pages2').item.json.property_state }}",
+              "rightValue": "WAITING_TICKET_CONFIRMATION",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        576
+      ],
+      "id": "69f13878-88cc-4810-83b2-d5a82f9404a5",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('When chat message received')\n    .item\n    .json\n    .chatInput\n    .trim()\n    .toLowerCase();\n\nlet action = \"\";\n\nif (\n    input === \"yes\" ||\n    input === \"y\"\n){\n    action = \"CREATE_TICKET\";\n}\n\nelse if(\n    input === \"no\" ||\n    input === \"n\"\n){\n    action = \"EXIT\";\n}\n\nreturn [{\n    json:{\n        action\n    }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        560
+      ],
+      "id": "bb8d57bd-a49e-45ee-9503-ccb9ac169efc",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "08e65c72-9dcb-4c3a-a50d-51dba156aec6",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "CREATE_TICKET",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        800,
+        544
+      ],
+      "id": "f8b67a0e-03db-4941-890e-d98917deb147",
+      "name": "If6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "631061a7-fcb3-4bb8-aae3-e4b4982bed90",
+              "name": "",
+              "value": "=✅ Your support ticket has been created successfully.\n\nStatus: Open\n\nOur support team will review your request and get back to you as soon as possible.\n\nplease provide us your mail so that we can contact you.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1248,
+        544
+      ],
+      "id": "55354c4c-337f-474b-a6be-5353fa3df34b",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Get many database pages2').item.json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "State|select",
+              "selectValue": "WAITING_FOR_MAIL"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        992,
+        512
+      ],
+      "id": "711b64a8-ecb4-41f4-ac3f-1f90bbfcc8b4",
+      "name": "Update a database page5",
+      "credentials": {
+        "notionApi": {
+          "id": "94XrDpH5wBvZq544",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Get many database pages2').item.json.id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "State|select",
+              "selectValue": "START"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        688
+      ],
+      "id": "572d0e26-048c-4d0f-881d-8c098a5b550b",
+      "name": "Update a database page6",
+      "credentials": {
+        "notionApi": {
+          "id": "94XrDpH5wBvZq544",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c6fda5f4-32b3-480c-aa07-b602276f85d0",
+              "name": "",
+              "value": "=No problem! 😊\n\nIf you need assistance in the future, simply type Hello to start a new conversation.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1104,
+        688
+      ],
+      "id": "9d4c39a9-0b5a-4c85-9d72-b5b951986ff0",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b4453bb6-ccc9-4015-a4a2-d76bf958b525",
+              "name": "output",
+              "value": "={{ $('AI Agent').item.json.output }}\nIf you need assistance in the future, simply type Hello to start a new conversation.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1664,
+        112
+      ],
+      "id": "ab5fb122-e875-4e8d-80e2-5b216b32eb87",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d4b74fa3-b15b-4a22-8920-55c7bbb00661",
+              "name": "output",
+              "value": "={{ $('AI Agent1').item.json.output }}\nIf you need assistance in the future, simply type Hello to start a new conversation.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1888,
+        432
+      ],
+      "id": "0a3e79bc-a67f-44fe-a1f2-6fdbeb0ea34c",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c3f417f3-db9e-4818-a1c4-4a98cf25dfd0",
+              "leftValue": "={{ $('Get many database pages2').item.json.property_state }}",
+              "rightValue": "WAITING_FOR_MAIL",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        528,
+        880
+      ],
+      "id": "9145e92a-3c68-416a-a055-6488553819ca",
+      "name": "If7"
+    },
+    {
+      "parameters": {
+        "jsCode": "const email = $('When chat message received').first().json.chatInput.trim();\n\nconst emailRegex =\n/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$/;\n\nif (emailRegex.test(email)) {\n\n  return [{\n    json: {\n      valid: true,\n      email: email\n    }\n  }];\n\n}\n\nreturn [{\n  json: {\n    valid: false,\n    output:\n      \"❌ That doesn't look like a valid email address.\\n\\nPlease enter a valid email address.\\n\\nExample: john@example.com\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        864
+      ],
+      "id": "3737086a-91d1-4935-93fc-3af39bbf74c7",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "16baef74-36de-4b96-8ee5-43fd36f7bf88",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        960,
+        864
+      ],
+      "id": "38ae588b-40cb-43aa-ba4f-8be3e3c6e7d5",
+      "name": "If8"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "389aed9d-ae9b-80e3-a22a-e8a14bef023c",
+          "mode": "list",
+          "cachedResultName": "Support Tickets",
+          "cachedResultUrl": "https://app.notion.com/p/389aed9dae9b80e3a22ae8a14bef023c"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Customer Email|email",
+              "emailValue": "={{ $json.email }}"
+            },
+            {
+              "key": "Status|select",
+              "selectValue": "open"
+            },
+            {
+              "key": "session id|rich_text",
+              "textContent": "={{ $('When chat message received').item.json.sessionId }}"
+            },
+            {
+              "key": "Date Created|date",
+              "date": "={{ $now }}"
+            },
+            {
+              "key": "Customer Question|rich_text",
+              "textContent": "={{ $('Get many database pages2').item.json.property_original_question }}"
+            },
+            {
+              "key": "category|select",
+              "selectValue": "={{ $('Get many database pages2').item.json.property_category }}"
+            },
+            {
+              "key": "Ticket ID|title",
+              "title": "={{ $now }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1216,
+        832
+      ],
+      "id": "32706a44-e569-416a-b50c-4e7aaabf60b7",
+      "name": "Create a database page2",
+      "credentials": {
+        "notionApi": {
+          "id": "94XrDpH5wBvZq544",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e9ae76a0-48f7-45f9-af9d-0ac82906f3f5",
+              "name": "",
+              "value": "=✅ Your support ticket has been created successfully.\n\nStatus: Open\n\nOur support team will review your request and get back to you as soon as possible.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        832
+      ],
+      "id": "56da21e0-1e37-45fb-9157-6380183af06f",
+      "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Get many database pages2').item.json.id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "State|select",
+              "selectValue": "START"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1424,
+        832
+      ],
+      "id": "86279516-93b4-4780-9da7-cc52a83bf5d7",
+      "name": "Update a database page7",
+      "credentials": {
+        "notionApi": {
+          "id": "94XrDpH5wBvZq544",
+          "name": "Notion account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Get many database pages1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Create a database page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Create a database page": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Get many database pages2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages2": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get many database pages",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        []
+      ]
+    },
+    "Update a database page": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Update a database page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update a database page2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Update a database page1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a database page1": {
+      "main": [
+        [
+          {
+            "node": "Get many database pages3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Update a database page4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update a database page3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a database page4": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        []
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "If6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If6": {
+      "main": [
+        [
+          {
+            "node": "Update a database page5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update a database page6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        []
+      ]
+    },
+    "Update a database page5": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a database page6": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a database page2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a database page3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If7": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "If8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If8": {
+      "main": [
+        [
+          {
+            "node": "Create a database page2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a database page2": {
+      "main": [
+        [
+          {
+            "node": "Update a database page7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a database page7": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a3dc1dd3-6600-4abb-9d2a-e74294fc0aa8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd4275c6348f4cc03c02c5b1b6051d6e3cf5c7e69b89c153d2382a7beb540faf"
+  },
+  "id": "wXhfb7H1chNl8wo3",
+  "tags": []
+}
