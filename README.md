@@ -113,9 +113,7 @@ AI-Customer-Support-Agent-n8n
 ---
 
 #  Author
-**Vaibhav**
 
-Built using n8n + Ollama + Notion.
 **Vaibhav**
 
 Built using n8n + Ollama + Notion.
